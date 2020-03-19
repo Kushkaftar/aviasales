@@ -47,6 +47,7 @@ const showCity = (input, list) => {
             return fixItem.startsWith(input.value.toLowerCase())
 
         });
+        sort(filterCity)
         filterCity.forEach((item) => {
             const li = document.createElement('li');
             li.classList.add('dropdown__cities');

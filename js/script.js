@@ -3,8 +3,8 @@ const formSearch = document.querySelector('.form-search'),
     dropdownCitiesFrom = document.querySelector('.dropdown__cities-from'),
     inputCitiesTo = document.querySelector('.input__cities-to'),
     dropdownCitiesTo = document.querySelector('.dropdown__cities-to'),
-    inputDateDepart = document.querySelector('.input__date-depart'),
-    buttonSearch = document.querySelector('.button button__search');
+    inputDateDepart = document.querySelector('.input__date-depart');
+//buttonSearch = document.querySelector('.button button__search');
 
 
 
@@ -47,7 +47,6 @@ const showCity = (input, list) => {
             return fixItem.startsWith(input.value.toLowerCase())
 
         });
-        sort(filterCity)
         filterCity.forEach((item) => {
             const li = document.createElement('li');
             li.classList.add('dropdown__cities');
@@ -69,7 +68,7 @@ const renderChiapDay = (cheapTicket) => {
     console.log(cheapTicket);
 }
 
-const sort = (arr) => {
+const sortNumb = (arr) => {
     arr.sort(function (a, b) {
         if (a.value > b.value) {
             return 1;
@@ -77,7 +76,6 @@ const sort = (arr) => {
         if (a.value < b.value) {
             return -1;
         }
-        // a должно быть равным b
         return 0;
     });
 }
@@ -85,7 +83,7 @@ const sort = (arr) => {
 // sort
 const renderChiapYear = (cheapTickets) => {
 
-    sort(cheapTickets);
+    sortNumb(cheapTickets);
 
     console.log(cheapTickets);
 }
@@ -120,9 +118,9 @@ formSearch.addEventListener('submit', (event) => {
     }
     console.log(formData);
 
-    const requestDdata = '?dapart_date=' + formData.when + '&origin=' + formData.from + '&destination=' + formData.to
+    const requestData = '?dapart_date=' + formData.when + '&origin=' + formData.from + '&destination=' + formData.to
         + '&one_way=true&token=' + API_KEY;
-    getData(proxy + calendar + requestDdata, (response) => {
+    getData(proxy + calendar + requestData, (response) => {
         console.log(JSON.parse(response));
         renderChiap(response, formData.when)
     })

@@ -43,7 +43,8 @@ const showCity = (input, list) => {
         const filterCity = city.filter((item) => {
 
             const fixItem = item.name.toLowerCase();
-            return fixItem.includes(input.value.toLowerCase())
+            // return fixItem.includes(input.value.toLowerCase())
+            return fixItem.startsWith(input.value.toLowerCase())
 
         });
         filterCity.forEach((item) => {

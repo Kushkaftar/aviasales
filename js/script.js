@@ -6,6 +6,8 @@ const formSearch = document.querySelector('.form-search'),
     inputDateDepart = document.querySelector('.input__date-depart');
 //buttonSearch = document.querySelector('.button button__search');
 
+const cheapestTicket = document.getElementById('cheapest-ticket'),
+    otherCheapTickets = document.getElementById('other-cheap-tickets');
 
 
 let city = [];
@@ -64,12 +66,8 @@ const handlerCity = (event, input, list) => {
     }
 }
 
-const renderChiapDay = (cheapTicket) => {
-    console.log(cheapTicket);
-}
-
 const sortNumb = (arr) => {
-    arr.sort(function (a, b) {
+    arr.sort((a, b) => {
         if (a.value > b.value) {
             return 1;
         }
@@ -77,16 +75,26 @@ const sortNumb = (arr) => {
             return -1;
         }
         return 0;
+
     });
+}
+
+const renderChiapDay = (cheapTicket) => {
+    cheapestTicket.style.display = 'block';
+    cheapestTicket.innerHTML ='<h2>Самый дешевый билет на выбранную дату</h2>';
+   const ticket = createCard(cheapTicket[0]);
+   cheapestTicket.append(ticket);
 }
 
 // sort
 const renderChiapYear = (cheapTickets) => {
-
+    otherCheapTickets.style.display = 'block';
+    otherCheapTickets.innerHTML ='<h2>Самые дешевые билеты на другие даты</h2>';
     sortNumb(cheapTickets);
 
     console.log(cheapTickets);
 }
+
 
 const renderChiap = (data, date) => {
     const cheapTicketYear = JSON.parse(data).best_prices;
@@ -96,6 +104,69 @@ const renderChiap = (data, date) => {
 
     renderChiapDay(cheapTicketDay);
     renderChiapYear(cheapTicketYear);
+}
+
+const getNaveCity = (code) => {
+    const objCity = city.find((item) => item.code === code);
+    return objCity.name;
+
+}
+
+const getCanges = (num) => {
+    if (num) {
+        return num === 1 ? '1 change' : '2 change'
+    }else {
+        return 'not change'
+    }
+}
+
+const  getDate = (date) => {
+    return new Date(date).toLocaleString('ru', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+    });
+}
+
+const createCard =(data) =>{
+    const ticket = document.createElement('article');
+    ticket.classList.add('ticket');
+
+    let deep = '';
+
+    if (data) {
+        deep =`
+        <h3 class="agent">${data.gate}</h3>
+        <div class="ticket__wrapper">
+            <div class="left-side">
+                <a href="https://www.aviasales.ru/search/SVX2905KGD1" class="button button__buy">Купить
+                    за ${data.value}₽</a>
+            </div>
+            <div class="right-side">
+                <div class="block-left">
+                    <div class="city__from">Вылет из города
+                        <span class="city__name">${getNaveCity(data.origin)}</span>
+                    </div>
+                    <div class="date">${getDate(data.depart_date)} г.</div>
+                </div>
+        
+                <div class="block-right">
+                <div class="changes">${getCanges(data.number_of_changes)}</div>
+                    <div class="city__to">Город назначения:
+                        <span class="city__name">${getNaveCity(data.destination)}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        `;
+    } else {
+        deep = '<h3> Not ticets </h3>';
+    }
+
+    ticket.insertAdjacentHTML('afterbegin', deep)
+    return ticket;
 }
 
 inputCitiesFrom.addEventListener('input', () => { showCity(inputCitiesFrom, dropdownCitiesFrom) });
@@ -110,24 +181,40 @@ dropdownCitiesTo.addEventListener('click', (event) => {
 });
 
 formSearch.addEventListener('submit', (event) => {
-    event.preventDefault()
+    event.preventDefault();
+
+
+
     const formData = {
-        from: city.find((item) => inputCitiesFrom.value === item.name).code,
-        to: city.find((item) => inputCitiesTo.value === item.name).code,
+        from: city.find((item) => inputCitiesFrom.value === item.name),
+        to: city.find((item) => inputCitiesTo.value === item.name),
         when: inputDateDepart.value
     }
+    if (formData.from && formData.to) {
     console.log(formData);
 
-    const requestData = '?dapart_date=' + formData.when + '&origin=' + formData.from + '&destination=' + formData.to
+    const requestData = '?dapart_date=' + formData.when + '&origin=' + formData.from.code + '&destination=' + formData.to.code
         + '&one_way=true&token=' + API_KEY;
     getData(proxy + calendar + requestData, (response) => {
         console.log(JSON.parse(response));
         renderChiap(response, formData.when)
     })
+}else {
+        alert('incorrect name city')
+    }
 })
 
 getData(proxy + citiesAPI, (data) => {
     city = JSON.parse(data).filter(item => item.name);
+    city.sort((a, b) => {
+        if (a.name > b.name) {
+            return 1;
+        }
+        if (a.name < b.name) {
+            return -1;
+        }
+        return 0;
+    });
     /*  console.log(JSON.parse(data)); */
 });
 
